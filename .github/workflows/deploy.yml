@@ -1,18 +1,3 @@
-name: Deploy Astro site to Pages
-
-on:
-  # Activa el despliegue cada vez que hagas push a tu rama principal
-  push:
-    branches: [main, master, gh-pages]
-  # Permite ejecutar este flujo manualmente desde la pestaña Actions
-  workflow_dispatch:
-
-# Permisos estrictos necesarios para publicar en GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,10 +5,17 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
       
+      # PASO NUEVO: Instalar pnpm en el servidor de GitHub
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9 # Instala la versión más reciente de pnpm
+          
       - name: Install, build, and upload your Astro site
         uses: withastro/action@v3
-        # La acción oficial de Astro se encarga de instalar Node, 
-        # detectar tu package manager (npm/yarn) y hacer el build automáticamente.
+        with:
+          # PASO NUEVO: Forzamos el gestor para evitar la auto-detección
+          package-manager: pnpm 
 
   deploy:
     needs: build
