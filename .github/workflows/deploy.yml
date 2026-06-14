@@ -1,0 +1,37 @@
+name: Deploy Astro site to Pages
+
+on:
+  # Activa el despliegue cada vez que hagas push a tu rama principal
+  push:
+    branches: [main, master, gh-pages]
+  # Permite ejecutar este flujo manualmente desde la pestaña Actions
+  workflow_dispatch:
+
+# Permisos estrictos necesarios para publicar en GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v4
+      
+      - name: Install, build, and upload your Astro site
+        uses: withastro/action@v3
+        # La acción oficial de Astro se encarga de instalar Node, 
+        # detectar tu package manager (npm/yarn) y hacer el build automáticamente.
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
